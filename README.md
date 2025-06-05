@@ -1,45 +1,131 @@
 # Пиццерия — заказ пиццы и пасты на Flask
 
-Это учебное приложение для заказа блюд онлайн. Включает:
-- авторизацию и регистрацию пользователей;
-- просмотр меню по категориям;
-- корзину и оформление заказа;
-- отзывы к блюдам;
-- админ-панель для управления меню, категориями и заказами.
+Это учебное приложение для онлайн-заказа еды. Вы можете:
+- Смотреть меню по категориям
+- Добавлять блюда в корзину и оформлять заказ
+- Оставлять отзывы к блюдам
+- Регистрироваться и авторизовываться
+- Управлять меню, категориями и заказами в админ-панели
 
-## Быстрый старт
+---
 
-1. **Клонируйте репозиторий и перейдите в папку проекта:**
-   ```sh
-   git clone https://github.com/Dienly-Bogdan/test.git
-   cd test
-   ```
+## Установка и запуск (подробная инструкция)
 
-2. **Установите зависимости:**
-   ```sh
-   pip install -r requirements.txt
-   ```
+### 1. Клонирование репозитория
 
-3. **Создайте базу данных:**
-   ```sh
-   flask init-db
-   ```
-   (Или выполните SQL-скрипт `schema.sql` вручную через SQLite.)
+```sh
+git clone https://github.com/Dienly-Bogdan/test.git
+cd test
+```
 
-4. **Запустите приложение:**
-   ```sh
-   python app.py
-   ```
-   По умолчанию приложение будет доступно на [http://localhost:8088](http://localhost:8088).
+### 2. Создание и активация виртуального окружения (рекомендуется)
 
-5. **Добавьте хотя бы одну категорию и блюдо через админку.**
+#### Windows
+
+```sh
+python -m venv venv
+venv\Scripts\activate
+```
+
+#### macOS/Linux
+
+```sh
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 3. Установка зависимостей
+
+```sh
+pip install -r requirements.txt
+```
+
+### 4. Инициализация базы данных
+
+**Внимание:**  
+База данных создаётся по структуре из файла `schema.sql`.  
+Если вы уже создавали базу ранее — этот шаг можно пропустить.
+
+#### Через flask CLI
+
+**Windows (PowerShell):**
+```sh
+$env:FLASK_APP = "app.py"
+python -m flask init-db
+```
+
+**Windows (cmd):**
+```cmd
+set FLASK_APP=app.py
+python -m flask init-db
+```
+
+**macOS/Linux:**
+```sh
+export FLASK_APP=app.py
+flask init-db
+```
+
+#### Если flask CLI не работает
+
+- Откройте SQLite Browser (или любой SQLite-клиент)
+- Создайте файл базы данных `pasta_pizza.db` (или с нужным именем)
+- Вставьте содержимое `schema.sql` и выполните
+
+### 5. Запуск приложения
+
+```sh
+python app.py
+```
+По умолчанию сайт откроется на: [http://localhost:8088](http://localhost:8088)
+
+---
+
+## Доступ к приложению
+
+- Главная страница: [http://localhost:8088/](http://localhost:8088/)
+- Меню: [http://localhost:8088/menu](http://localhost:8088/menu)
+- Корзина: [http://localhost:8088/cart](http://localhost:8088/cart)
+- Регистрация: [http://localhost:8088/register](http://localhost:8088/register)
+- Вход: [http://localhost:8088/login](http://localhost:8088/login)
+
+---
+
+## Админ-панель
+
+> **Админ-панель доступна только для пользователей с флагом is_admin=1 в базе данных.**
+
+- Панель администратора: [http://localhost:8088/admin/dashboard](http://localhost:8088/admin/dashboard)
+- Управление блюдами: [http://localhost:8088/admin/manage_menu](http://localhost:8088/admin/manage_menu)
+- Добавить блюдо: [http://localhost:8088/admin/add_dish](http://localhost:8088/admin/add_dish)
+- Управление категориями: [http://localhost:8088/admin/manage_categories](http://localhost:8088/admin/manage_categories)
+- Управление заказами: [http://localhost:8088/admin/manage_orders](http://localhost:8088/admin/manage_orders)
+
+### Как сделать себя админом
+
+После регистрации пользователя вручную измените поле `is_admin` на 1 в таблице `users` вашей базы данных (например, через SQLite Browser).
+
+---
 
 ## Структура проекта
 
-- `app.py` — основные маршруты и логика приложения.
-- `database.py` — подключение к базе данных и вспомогательные функции.
-- `schema.sql` — структура базы данных (создание таблиц).
-- `requirements.txt` — зависимости Python.
-- `templates/` — HTML-шаблоны.
-- `static/` — стили, картинки, JS.
-    - `uploads/` — загружаемые изображения блюд.
+- `app.py` — Flask-приложение, все маршруты и логика
+- `database.py` — подключение к базе данных и вспомогательные функции
+- `schema.sql` — структура базы данных SQLite
+- `requirements.txt` — зависимости Python
+- `templates/` — все HTML-шаблоны (обязательны: `base.html`, `index.html`, `menu.html`, `cart.html`, `order.html`, `dish_detail.html`, шаблоны для админки)
+- `static/` — стили, картинки, JS (здесь же папка `uploads` для фоток блюд)
+
+---
+
+## Примечания
+
+- Если шаблон не найден (ошибка `TemplateNotFound`), убедитесь что файл с нужным именем лежит в папке `templates`.
+- Если возникает ошибка “no such table”, убедитесь, что вы выполнили инициализацию БД.
+- Для загрузки картинок блюда создайте папку `static/uploads`.
+
+---
+
+## Лицензия
+
+MIT или любая другая по вашему выбору.

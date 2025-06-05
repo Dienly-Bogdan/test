@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Оформление заказа</h2>
+<form method="post">
+    <div class="mb-3">
+        <label>Имя:</label>
+        <input class="form-control" name="name" required>
+    </div>
+    <div class="mb-3">
+        <label>Телефон:</label>
+        <input class="form-control" name="phone" required>
+    </div>
+    <div class="mb-3">
+        <label>Адрес:</label>
+        <input class="form-control" name="address" required>
+    </div>
+    <div class="mb-3">
+        <label>Время доставки:</label>
+        <input class="form-control" name="delivery_time" required>
+    </div>
+    <div class="mb-3">
+        <label>Способ оплаты:</label>
+        <select class="form-select" name="payment_method" required>
+            <option value="card">Картой</option>
+            <option value="cash">Наличные</option>
+        </select>
+    </div>
+    <button class="btn btn-success">Заказать</button>
+</form>
+{% endblock %}
