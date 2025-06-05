@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Корзина{% endblock %}
+{% block content %}
+<h2>Корзина</h2>
+{% if dishes %}
+<table style="width:100%">
+    <tr>
+        <th>Блюдо</th><th>Кол-во</th><th>Сумма</th><th></th>
+    </tr>
+    {% for item in dishes %}
+    <tr>
+        <td>{{ item.dish.name }}</td>
+        <td>{{ item.qty }}</td>
+        <td>{{ item.sum }} ₽</td>
+        <td><a class="btn" href="{{ url_for('remove_from_cart', dish_id=item.dish.id) }}">Удалить</a></td>
+    </tr>
+    {% endfor %}
+</table>
+<p><b>Итого:</b> {{ total }} ₽</p>
+<a class="btn" href="{{ url_for('order') }}">Оформить заказ</a>
+{% else %}
+<p>Корзина пуста</p>
+{% endif %}
+{% endblock %}

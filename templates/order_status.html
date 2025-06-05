@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Статус заказа{% endblock %}
+{% block content %}
+<h2>Статус заказа</h2>
+<p>Текущий статус: <b>{{ order.status }}</b></p>
+<p>Адрес: {{ order.address }}</p>
+<p>Телефон: {{ order.phone }}</p>
+<p>Время доставки: {{ order.delivery_time }}</p>
+{% endblock %}

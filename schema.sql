@@ -1,0 +1,18 @@
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS dishes;
+
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    email TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    is_admin BOOLEAN NOT NULL DEFAULT 0
+);
+
+CREATE TABLE dishes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    description TEXT,
+    price REAL NOT NULL,
+    category TEXT NOT NULL
+);

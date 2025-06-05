@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Паста и Пицца{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</head>
+<body>
+    <header>
+        <h1>Кафе доставки "Паста и Пицца"</h1>
+        <nav>
+            <a href="{{ url_for('index') }}">Главная</a>
+            <a href="{{ url_for('menu') }}">Меню</a>
+            {% if session.get('user_id') %}
+                <a href="{{ url_for('cart') }}">Корзина</a>
+                {% if session.get('is_admin') %}
+                    <a href="{{ url_for('admin_dashboard') }}">Админ</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}">Выход</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Вход</a>
+                <a href="{{ url_for('register') }}">Регистрация</a>
+            {% endif %}
+        </nav>
+    </header>
+    <main>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="flashes">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <p>&copy; 2025 Паста и Пицца</p>
+    </footer>
+</body>
+</html>
