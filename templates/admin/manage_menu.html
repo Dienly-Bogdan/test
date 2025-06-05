@@ -1,31 +1,30 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Меню</h2>
-<table>
-  <tr>
-    <th>ID</th><th>Название</th><th>Цена</th><th>Категория</th><th>Действия</th>
-  </tr>
-  {% for dish in dishes %}
-  <tr>
-    <td>{{ dish[0] }}</td>
-    <td>{{ dish[1] }}</td>
-    <td>{{ dish[3] }}</td>
-    <td>
-      {% for cat in categories %}
-        {% if cat.id == dish[4] %}
-          {{ cat.name }}
-        {% endif %}
-      {% endfor %}
-    </td>
-    <td>
-      <a href="{{ url_for('admin_edit_dish', dish_id=dish[0]) }}">Редактировать</a>
-      |
-      <form action="{{ url_for('admin_delete_dish', dish_id=dish[0]) }}" method="post" style="display:inline;">
-        <button type="submit" onclick="return confirm('Удалить блюдо?')">Удалить</button>
-      </form>
-    </td>
-  </tr>
-  {% endfor %}
+<h2>Блюда</h2>
+<a class="btn btn-success mb-3" href="{{ url_for('admin_add_dish') }}">Добавить блюдо</a>
+<table class="table">
+    <tr>
+        <th>ID</th><th>Название</th><th>Цена</th><th>Категория</th><th></th>
+    </tr>
+    {% for dish in dishes %}
+    <tr>
+        <td>{{ dish["id"] }}</td>
+        <td>{{ dish["title"] }}</td>
+        <td>{{ dish["price"] }}</td>
+        <td>
+          {% for cat in categories %}
+            {% if cat["id"] == dish["category_id"] %}
+              {{ cat["name"] }}
+            {% endif %}
+          {% endfor %}
+        </td>
+        <td>
+          <a href="{{ url_for('admin_edit_dish', dish_id=dish["id"]) }}">✏️</a>
+          <form action="{{ url_for('admin_delete_dish', dish_id=dish["id"]) }}" method="post" style="display:inline;">
+              <button class="btn btn-danger btn-sm" onclick="return confirm('Удалить блюдо?')">🗑️</button>
+          </form>
+        </td>
+    </tr>
+    {% endfor %}
 </table>
-<a href="{{ url_for('admin_add_dish') }}">Добавить блюдо</a>
 {% endblock %}

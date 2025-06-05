@@ -2,7 +2,8 @@
 {% block content %}
 <h2>Админ-панель</h2>
 <ul>
-  <li><a href="{{ url_for('admin_manage_menu') }}">Управление меню</a></li>
-  <li><a href="{{ url_for('admin_manage_orders') }}">Управление заказами</a></li>
+  <li><a href="{{ url_for('admin_manage_menu') }}">Меню</a></li>
+  <li><a href="{{ url_for('admin_manage_categories') }}">Категории</a></li>
+  <li><a href="{{ url_for('admin_manage_orders') }}">Заказы</a></li>
 </ul>
 {% endblock %}

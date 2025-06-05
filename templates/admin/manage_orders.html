@@ -1,30 +1,30 @@
-    {% extends "base.html" %}
-    {% block content %}
-    <h2>Заказы</h2>
-    <table border="1" cellpadding="5">
-        <tr>
-            <th>ID</th><th>Клиент</th><th>Телефон</th><th>Адрес</th><th>Время</th><th>Статус</th><th>Действие</th>
-        </tr>
-        {% for o in orders %}
-        <tr>
-            <td>{{ o[0] }}</td>
-            <td>{{ o[1] }}</td>
-            <td>{{ o[3] }}</td>
-            <td>{{ o[2] }}</td>
-            <td>{{ o[7] }}</td>
-            <td>{{ o[4] }}</td>
-            <td>
-                <form action="{{ url_for('admin_order_status', order_id=o[0]) }}" method="post">
-                    <select name="status">
-                        <option {{ 'selected' if o[4]=='Принят' }}>Принят</option>
-                        <option {{ 'selected' if o[4]=='Готовится' }}>Готовится</option>
-                        <option {{ 'selected' if o[4]=='Доставляется' }}>Доставляется</option>
-                        <option {{ 'selected' if o[4]=='Выполнен' }}>Выполнен</option>
-                    </select>
-                    <button>OK</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-    {% endblock %}
+{% extends "base.html" %}
+{% block content %}
+<h2>Заказы</h2>
+<table class="table">
+    <tr>
+        <th>ID</th><th>Пользователь</th><th>Адрес</th><th>Телефон</th><th>Статус</th><th>Дата</th><th>Действия</th>
+    </tr>
+    {% for order in orders %}
+    <tr>
+        <td>{{ order["id"] }}</td>
+        <td>{{ order["user_id"] }}</td>
+        <td>{{ order["address"] }}</td>
+        <td>{{ order["phone"] }}</td>
+        <td>{{ order["status"] }}</td>
+        <td>{{ order["created_at"] }}</td>
+        <td>
+            <form method="post" action="{{ url_for('admin_order_status', order_id=order["id"]) }}">
+                <select name="status" class="form-select d-inline-block" style="width: 150px;">
+                    <option value="Принят" {% if order["status"] == "Принят" %}selected{% endif %}>Принят</option>
+                    <option value="Готовится" {% if order["status"] == "Готовится" %}selected{% endif %}>Готовится</option>
+                    <option value="В доставке" {% if order["status"] == "В доставке" %}selected{% endif %}>В доставке</option>
+                    <option value="Завершён" {% if order["status"] == "Завершён" %}selected{% endif %}>Завершён</option>
+                </select>
+                <button class="btn btn-primary btn-sm">Обновить</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Категории</h2>
+<form method="post" action="{{ url_for('admin_add_category') }}" class="mb-3">
+    <input class="form-control d-inline-block" style="width:300px;" type="text" name="name" placeholder="Новая категория" required>
+    <button class="btn btn-success">Добавить</button>
+</form>
+<table class="table">
+    <tr><th>ID</th><th>Название</th><th></th></tr>
+    {% for cat in categories %}
+    <tr>
+        <td>{{ cat["id"] }}</td>
+        <td>{{ cat["name"] }}</td>
+        <td>
+            <form method="post" action="{{ url_for('admin_delete_category', cat_id=cat["id"]) }}" style="display:inline;">
+                <button class="btn btn-danger btn-sm" onclick="return confirm('Удалить категорию?')">🗑️</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
