@@ -1,34 +1,31 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Меню</h2>
-<a href="{{ url_for('admin_add_dish') }}" style="color:#c0392b;">Добавить блюдо</a>
-<table border="1" cellpadding="5" style="margin-top:12px;">
-    <tr>
-        <th>Фото</th><th>Название</th><th>Категория</th><th>Цена</th><th>Вегет.</th><th>Острое</th><th>Действия</th>
-    </tr>
-    {% for dish in dishes %}
-    <tr>
-        <td>
-            {% if dish.image %}
-                <img src="{{ url_for('static', filename='uploads/' ~ dish.image) }}" width="56">
-            {% endif %}
-        </td>
-        <td>{{ dish.title }}</td>
-        <td>
-            {% for cat in categories %}
-                {% if cat.id == dish.category_id %}{{ cat.name }}{% endif %}
-            {% endfor %}
-        </td>
-        <td>{{ dish.price }} ₽</td>
-        <td>{% if dish.is_veg %}✔{% endif %}</td>
-        <td>{% if dish.is_spicy %}🔥{% endif %}</td>
-        <td>
-            <a href="{{ url_for('admin_edit_dish', dish_id=dish.id) }}">Редактировать</a> |
-            <form action="{{ url_for('admin_delete_dish', dish_id=dish.id) }}" method="post" style="display:inline;">
-                <button onclick="return confirm('Точно удалить?')">Удалить</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
+<table>
+  <tr>
+    <th>ID</th><th>Название</th><th>Цена</th><th>Категория</th><th>Действия</th>
+  </tr>
+  {% for dish in dishes %}
+  <tr>
+    <td>{{ dish[0] }}</td>
+    <td>{{ dish[1] }}</td>
+    <td>{{ dish[3] }}</td>
+    <td>
+      {% for cat in categories %}
+        {% if cat.id == dish[4] %}
+          {{ cat.name }}
+        {% endif %}
+      {% endfor %}
+    </td>
+    <td>
+      <a href="{{ url_for('admin_edit_dish', dish_id=dish[0]) }}">Редактировать</a>
+      |
+      <form action="{{ url_for('admin_delete_dish', dish_id=dish[0]) }}" method="post" style="display:inline;">
+        <button type="submit" onclick="return confirm('Удалить блюдо?')">Удалить</button>
+      </form>
+    </td>
+  </tr>
+  {% endfor %}
 </table>
+<a href="{{ url_for('admin_add_dish') }}">Добавить блюдо</a>
 {% endblock %}
