@@ -1,21 +1,30 @@
-{% extends "base.html" %}
-{% block title %}Заказы{% endblock %}
-{% block content %}
-<h2>Заказы</h2>
-<table style="width:100%">
-    <tr>
-        <th>№</th><th>Клиент</th><th>Статус</th><th>Сумма</th><th>Дата</th>
-    </tr>
-    {% for order in orders %}
-    <tr>
-        <td>{{ order.id }}</td>
-        <td>{{ order.user.name }}</td>
-        <td>{{ order.status }}</td>
-        <td>
-            {{ order.items|map(attribute='price')|sum }}
-        </td>
-        <td>{{ order.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
-    </tr>
-    {% endfor %}
-</table>
-{% endblock %}
+    {% extends "base.html" %}
+    {% block content %}
+    <h2>Заказы</h2>
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>ID</th><th>Клиент</th><th>Телефон</th><th>Адрес</th><th>Время</th><th>Статус</th><th>Действие</th>
+        </tr>
+        {% for o in orders %}
+        <tr>
+            <td>{{ o[0] }}</td>
+            <td>{{ o[1] }}</td>
+            <td>{{ o[3] }}</td>
+            <td>{{ o[2] }}</td>
+            <td>{{ o[7] }}</td>
+            <td>{{ o[4] }}</td>
+            <td>
+                <form action="{{ url_for('admin_order_status', order_id=o[0]) }}" method="post">
+                    <select name="status">
+                        <option {{ 'selected' if o[4]=='Принят' }}>Принят</option>
+                        <option {{ 'selected' if o[4]=='Готовится' }}>Готовится</option>
+                        <option {{ 'selected' if o[4]=='Доставляется' }}>Доставляется</option>
+                        <option {{ 'selected' if o[4]=='Выполнен' }}>Выполнен</option>
+                    </select>
+                    <button>OK</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endblock %}

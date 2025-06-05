@@ -1,43 +1,33 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Паста и Пицца{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+    {% block head %}{% endblock %}
 </head>
 <body>
     <header>
-        <h1>Кафе доставки "Паста и Пицца"</h1>
+        <a href="{{ url_for('index') }}" class="logo">Паста и Пицца 🍝🍕</a>
         <nav>
-            <a href="{{ url_for('index') }}">Главная</a>
             <a href="{{ url_for('menu') }}">Меню</a>
             {% if session.get('user_id') %}
-                <a href="{{ url_for('cart') }}">Корзина</a>
-                {% if session.get('is_admin') %}
-                    <a href="{{ url_for('admin_dashboard') }}">Админ</a>
-                {% endif %}
-                <a href="{{ url_for('logout') }}">Выход</a>
+                <span>Привет, {{ session.get('user_name') }}!</span>
+                <a href="{{ url_for('logout') }}">Выйти</a>
             {% else %}
-                <a href="{{ url_for('login') }}">Вход</a>
+                <a href="{{ url_for('login') }}">Войти</a>
                 <a href="{{ url_for('register') }}">Регистрация</a>
             {% endif %}
         </nav>
     </header>
-    <main>
+    <div class="container">
         {% with messages = get_flashed_messages() %}
             {% if messages %}
-                <ul class="flashes">
-                {% for message in messages %}
-                    <li>{{ message }}</li>
-                {% endfor %}
-                </ul>
+            <div class="flash">{{ messages[0] }}</div>
             {% endif %}
         {% endwith %}
         {% block content %}{% endblock %}
-    </main>
-    <footer>
-        <p>&copy; 2025 Паста и Пицца</p>
-    </footer>
+    </div>
 </body>
 </html>

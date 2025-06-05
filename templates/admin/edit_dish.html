@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Редактировать блюдо</h2>
+<form method="post" enctype="multipart/form-data">
+    <label>Название</label>
+    <input type="text" name="title" value="{{ dish.title }}" required>
+    <label>Описание</label>
+    <input type="text" name="description" value="{{ dish.description }}">
+    <label>Цена</label>
+    <input type="number" step="0.01" name="price" value="{{ dish.price }}" required>
+    <label>Категория</label>
+    <select name="category_id">
+        {% for cat in categories %}
+            <option value="{{ cat.id }}" {% if cat.id == dish.category_id %}selected{% endif %}>{{ cat.name }}</option>
+        {% endfor %}
+    </select>
+    <label>Фото</label>
+    <input type="file" name="image">
+    <label><input type="checkbox" name="is_veg" value="1" {% if dish.is_veg %}checked{% endif %}> Вегетарианское</label>
+    <label><input type="checkbox" name="is_spicy" value="1" {% if dish.is_spicy %}checked{% endif %}> Острое</label>
+    <button type="submit">Сохранить</button>
+</form>
+{% endblock %}

@@ -1,24 +1,39 @@
 {% extends "base.html" %}
-{% block title %}Корзина{% endblock %}
+{% block title %}Корзина | Паста и Пицца{% endblock %}
 {% block content %}
 <h2>Корзина</h2>
-{% if dishes %}
-<table style="width:100%">
-    <tr>
-        <th>Блюдо</th><th>Кол-во</th><th>Сумма</th><th></th>
-    </tr>
-    {% for item in dishes %}
-    <tr>
-        <td>{{ item.dish.name }}</td>
-        <td>{{ item.qty }}</td>
-        <td>{{ item.sum }} ₽</td>
-        <td><a class="btn" href="{{ url_for('remove_from_cart', dish_id=item.dish.id) }}">Удалить</a></td>
-    </tr>
-    {% endfor %}
-</table>
-<p><b>Итого:</b> {{ total }} ₽</p>
-<a class="btn" href="{{ url_for('order') }}">Оформить заказ</a>
+{% if not cart_items %}
+    <p>Ваша корзина пуста.</p>
+    <a href="{{ url_for('menu') }}">К меню</a>
 {% else %}
-<p>Корзина пуста</p>
+    <table border="1" cellpadding="8" style="margin-bottom:20px;">
+        <tr>
+            <th>Блюдо</th>
+            <th>Количество</th>
+            <th>Цена</th>
+            <th>Сумма</th>
+            <th></th>
+        </tr>
+        {% for dish, qty in cart_items %}
+        <tr>
+            <td>
+                <img src="{{ url_for('static', filename='uploads/' ~ (dish.image or 'default.jpg')) }}" alt="" width="54" style="vertical-align:middle;">
+                {{ dish.title }}
+            </td>
+            <td>{{ qty }}</td>
+            <td>{{ dish.price }} ₽</td>
+            <td>{{ dish.price * qty }} ₽</td>
+            <td>
+                <form action="{{ url_for('cart_remove', dish_id=dish.id) }}" method="post">
+                    <button style="background:#c0392b;color:#fff;border:none;border-radius:3px;padding:2px 7px;">Удалить</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <div style="font-size:17px;font-weight:bold;margin-bottom:10px;">
+        Итого: {{ total }} ₽
+    </div>
+    <a href="{{ url_for('order') }}" class="auth-form button" style="background:#c0392b;color:#fff;padding:8px 16px;border-radius:6px;">Оформить заказ</a>
 {% endif %}
 {% endblock %}

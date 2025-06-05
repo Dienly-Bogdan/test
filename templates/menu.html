@@ -1,24 +1,20 @@
 {% extends "base.html" %}
-{% block title %}Меню{% endblock %}
+{% block title %}Меню | Паста и Пицца{% endblock %}
 {% block content %}
 <h2>Меню</h2>
-<form method="get" style="margin-bottom:10px;">
-    <select name="category" onchange="this.form.submit()">
-        <option value="">Все категории</option>
-        {% for cat in categories %}
-            <option value="{{ cat.id }}" {% if cat.id|string == selected_cat %}selected{% endif %}>{{ cat.name }}</option>
-        {% endfor %}
-    </select>
-</form>
+<div class="categories">
+    <a href="{{ url_for('menu') }}">Все</a>
+    {% for cat in categories %}
+        <a href="{{ url_for('menu', category_id=cat.id) }}">{{ cat.name }}</a>
+    {% endfor %}
+</div>
 <div class="menu-list">
     {% for dish in dishes %}
-    <div class="menu-card">
-        <img src="{{ dish.image_url or url_for('static', filename='img/noimage.jpg') }}" alt="{{ dish.name }}">
-        <h3>{{ dish.name }}</h3>
-        <div class="price">{{ dish.price }} ₽</div>
-        <p>{{ dish.description[:60] }}...</p>
-        <a class="btn" href="{{ url_for('product', dish_id=dish.id) }}">Подробнее</a>
-        <a class="btn" href="{{ url_for('add_to_cart', dish_id=dish.id) }}">В корзину</a>
+    <div class="dish-card">
+        <img src="{{ url_for('static', filename='uploads/' ~ (dish.image or 'default.jpg')) }}" alt="{{ dish.title }}">
+        <h3>{{ dish.title }}</h3>
+        <p>{{ dish.description }}</p>
+        <b>{{ dish.price }} ₽</b>
     </div>
     {% endfor %}
 </div>

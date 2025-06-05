@@ -1,44 +1,108 @@
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', Verdana, sans-serif;
+    background: #f8f6f2;
     margin: 0;
     padding: 0;
-    background-color: #fff8f0;
-    color: #333;
 }
-
-header, footer {
-    background-color: #e74c3c;
-    color: white;
-    padding: 1rem;
-    text-align: center;
+header {
+    background: #c0392b;
+    color: #fff;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
-
+.logo {
+    font-size: 26px;
+    color: #fff;
+    text-decoration: none;
+}
 nav a {
-    margin: 0 10px;
-    color: white;
+    color: #fff;
+    margin-left: 18px;
     text-decoration: none;
     font-weight: bold;
 }
-
-nav a:hover {
-    text-decoration: underline;
+.container {
+    padding: 30px 16px;
 }
-
-main {
-    padding: 2rem;
+.menu-preview, .menu-list {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
 }
-
-.flashes li {
-    background: #ffeaa7;
-    padding: 10px;
+.dish-card {
+    background: #fff;
+    border-radius: 13px;
+    box-shadow: 0 2px 10px #0002;
+    padding: 14px;
+    width: 210px;
+    text-align: center;
+}
+.dish-card img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
     margin-bottom: 10px;
-    border-left: 5px solid #e17055;
 }
-
-.menu-item {
-    border: 1px solid #ddd;
-    padding: 15px;
-    margin-bottom: 15px;
-    background: white;
+.categories {margin: 10px 0;}
+.categories a {
+    margin-right: 8px;
+    padding: 4px 12px;
+    background: #eee;
+    color: #c0392b;
+    border-radius: 7px;
+    text-decoration: none;
+    font-weight: bold;
+}
+.auth-form {
+    max-width: 340px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px #0001;
+    padding: 28px 22px 18px 22px;
+}
+.auth-form h2 {
+    text-align: center;
+    margin-bottom: 14px;
+}
+.auth-form label {
+    font-weight: bold;
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 2px;
+}
+.auth-form input {
+    width: 100%;
+    padding: 8px;
+    border: 1.5px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+.auth-form button {
+    width: 100%;
+    background: #c0392b;
+    color: #fff;
+    font-size: 18px;
+    padding: 10px 0;
+    border: none;
     border-radius: 8px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+.flash {
+    background: #ffd6d6;
+    color: #c0392b;
+    padding: 10px;
+    border-radius: 6px;
+    max-width: 340px;
+    margin: 18px auto;
+    text-align: center;
+}
+@media (max-width:700px) {
+    .menu-preview, .menu-list {flex-direction:column;align-items:center;}
+    .dish-card {width: 95vw;}
+    .container {padding: 10px;}
 }

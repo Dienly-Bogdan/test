@@ -1,112 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pasta & Pizza App</title>
-  <link rel="stylesheet" href="style.css">
-  <script defer src="app.js"></script>
-</head>
-<body>
-  <!-- Screen 1: Sign In -->
-  <div id="signin-screen" class="screen">
-    <div class="signin-card">
-      <img src="images/rice.jpg" alt="Food Image" class="signin-image">
-      <div class="tabs">
-        <span class="active">Sign In</span>
-        <span>Sign Up</span>
-      </div>
-      <input type="email" placeholder="E-mail address">
-      <input type="password" placeholder="Enter password">
-      <div class="remember">
-        <label><input type="checkbox"> Remember me</label>
-        <a href="#">Forgot password?</a>
-      </div>
-      <button onclick="showScreen('menu-screen')">Login</button>
-      <div class="divider">OR</div>
-      <div class="social">
-        <button>G</button>
-        <button>f</button>
-        <button>t</button>
-      </div>
+{% extends "base.html" %}
+{% block title %}Паста и Пицца | Главная{% endblock %}
+{% block content %}
+<h2>Добро пожаловать в "Паста и Пицца"!</h2>
+<p>Онлайн сервис заказа итальянской кухни на дом или в офис. <a href="{{ url_for('menu') }}">Перейти к меню</a></p>
+<div class="menu-preview">
+    {% for dish in dishes[:4] %}
+    <div class="dish-card">
+        <img src="{{ url_for('static', filename='uploads/' ~ (dish.image or 'default.jpg')) }}" alt="{{ dish.title }}">
+        <h3>{{ dish.title }}</h3>
+        <p>{{ dish.description }}</p>
+        <b>{{ dish.price }} ₽</b>
     </div>
-  </div>
-
-  <!-- Screen 2: Menu List -->
-  <div id="menu-screen" class="screen hidden">
-    <div class="header">
-      <h2>Our Menu</h2>
-      <button>🛒</button>
-    </div>
-    <div class="tabs-menu">
-      <button class="active">Meals</button>
-      <button>Sides</button>
-      <button>Snacks</button>
-    </div>
-    <div class="menu-list">
-      <div class="menu-item" onclick="showScreen('details-screen')">
-        <img src="images/noodles.jpg" alt="Spicy Noodles">
-        <p>Spicy Noodles<br><strong>₦1,500</strong></p>
-      </div>
-      <div class="menu-item">
-        <img src="images/shrimp.jpg" alt="Shrimp Pasta">
-        <p>Shrimp Pasta<br><strong>₦1,800</strong></p>
-      </div>
-      <div class="menu-item">
-        <img src="images/curry.jpg" alt="Vegetable Curry">
-        <p>Vegetable Curry<br><strong>₦1,200</strong></p>
-      </div>
-      <div class="menu-item">
-        <img src="images/mixed.jpg" alt="Mixed Salad">
-        <p>Mixed Salad<br><strong>₦1,500</strong></p>
-      </div>
-      <div class="menu-item">
-        <img src="images/pasta.jpg" alt="Chicken Pasta Salad">
-        <p>Chicken Pasta Salad<br><strong>₦1,500</strong></p>
-      </div>
-      <div class="menu-item">
-        <img src="images/beef.jpg" alt="Beef Salad">
-        <p>Beef Salad<br><strong>₦1,200</strong></p>
-      </div>
-    </div>
-    <div class="bottom-nav">
-      <button>💬</button>
-      <button>👤</button>
-      <button>📋</button>
-      <button>❤️</button>
-    </div>
-  </div>
-
-  <!-- Screen 3: Details Page -->
-  <div id="details-screen" class="screen hidden">
-    <img src="images/jollof.jpg" alt="Jollof Rice" class="details-img">
-    <div class="details">
-      <h2>Jollof Rice <span style="float: right">₦1,200</span></h2>
-      <p><strong>Description:</strong><br>
-      Rich and incredibly tasty rice dish, made with reduced tomatoes, bell peppers, chili peppers, onions, herbs and seasoning. <a href="#">(Each serving contains 248 calories)</a></p>
-
-      <h3>Recommended sides</h3>
-      <div class="sides">
-        <div class="side-item">
-          <img src="images/plantain.jpg" alt="Fried Plantain">
-          <p>₦300</p>
-        </div>
-        <div class="side-item">
-          <img src="images/coleslaw.jpg" alt="Coleslaw">
-          <p>₦800</p>
-        </div>
-        <div class="side-item">
-          <img src="images/chicken.jpg" alt="Fried Chicken">
-          <p>₦900</p>
-        </div>
-      </div>
-
-      <div class="total">
-        <p>Total: <strong>₦2,000</strong></p>
-        <button>Add to Cart</button>
-      </div>
-    </div>
-  </div>
-
-</body>
-</html>
+    {% endfor %}
+</div>
+{% endblock %}

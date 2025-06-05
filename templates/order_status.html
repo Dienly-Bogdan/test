@@ -1,9 +1,14 @@
 {% extends "base.html" %}
-{% block title %}Статус заказа{% endblock %}
+{% block title %}Статус заказа | Паста и Пицца{% endblock %}
 {% block content %}
-<h2>Статус заказа</h2>
-<p>Текущий статус: <b>{{ order.status }}</b></p>
-<p>Адрес: {{ order.address }}</p>
-<p>Телефон: {{ order.phone }}</p>
-<p>Время доставки: {{ order.delivery_time }}</p>
+<div style="max-width:420px;margin:40px auto;background:#fff;padding:28px 20px;border-radius:14px;box-shadow:0 2px 14px #0001;text-align:center;">
+    <h2>Статус заказа</h2>
+    <div style="font-size:23px;color:#c0392b;margin:18px 0;">
+        №{{ order_id }}
+    </div>
+    <div style="font-size:19px;margin-bottom:17px;">
+        <b>{{ status }}</b>
+    </div>
+    <a href="{{ url_for('index') }}" style="color:#c0392b;">На главную</a>
+</div>
 {% endblock %}

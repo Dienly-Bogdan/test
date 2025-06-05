@@ -1,23 +1,34 @@
 {% extends "base.html" %}
-{% block title %}Управление меню{% endblock %}
 {% block content %}
-<h2>Управление меню</h2>
-<form method="post">
-    <input name="name" placeholder="Название блюда" required>
-    <textarea name="description" placeholder="Описание" required></textarea>
-    <input name="price" placeholder="Цена" type="number" step="0.01" required>
-    <select name="category" required>
-        {% for cat in categories %}
-            <option value="{{ cat.id }}">{{ cat.name }}</option>
-        {% endfor %}
-    </select>
-    <input name="image_url" placeholder="URL изображения">
-    <button class="btn" type="submit">Добавить блюдо</button>
-</form>
-<h3>Блюда</h3>
-<ul>
+<h2>Меню</h2>
+<a href="{{ url_for('admin_add_dish') }}" style="color:#c0392b;">Добавить блюдо</a>
+<table border="1" cellpadding="5" style="margin-top:12px;">
+    <tr>
+        <th>Фото</th><th>Название</th><th>Категория</th><th>Цена</th><th>Вегет.</th><th>Острое</th><th>Действия</th>
+    </tr>
     {% for dish in dishes %}
-        <li>{{ dish.name }} — {{ dish.price }} ₽ ({{ dish.category.name }})</li>
+    <tr>
+        <td>
+            {% if dish.image %}
+                <img src="{{ url_for('static', filename='uploads/' ~ dish.image) }}" width="56">
+            {% endif %}
+        </td>
+        <td>{{ dish.title }}</td>
+        <td>
+            {% for cat in categories %}
+                {% if cat.id == dish.category_id %}{{ cat.name }}{% endif %}
+            {% endfor %}
+        </td>
+        <td>{{ dish.price }} ₽</td>
+        <td>{% if dish.is_veg %}✔{% endif %}</td>
+        <td>{% if dish.is_spicy %}🔥{% endif %}</td>
+        <td>
+            <a href="{{ url_for('admin_edit_dish', dish_id=dish.id) }}">Редактировать</a> |
+            <form action="{{ url_for('admin_delete_dish', dish_id=dish.id) }}" method="post" style="display:inline;">
+                <button onclick="return confirm('Точно удалить?')">Удалить</button>
+            </form>
+        </td>
+    </tr>
     {% endfor %}
-</ul>
+</table>
 {% endblock %}
