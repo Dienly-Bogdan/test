@@ -1,20 +1,36 @@
 {% extends "base.html" %}
-{% block title %}Меню | Паста и Пицца{% endblock %}
 {% block content %}
 <h2>Меню</h2>
-<div class="categories">
-    <a href="{{ url_for('menu') }}">Все</a>
+
+<!-- Категории -->
+<div>
+    <b>Категории:</b>
     {% for cat in categories %}
-        <a href="{{ url_for('menu', category_id=cat.id) }}">{{ cat.name }}</a>
+        <a href="{{ url_for('menu') }}?category_id={{ cat['id'] }}">{{ cat['name'] }}</a>{% if not loop.last %} | {% endif %}
     {% endfor %}
 </div>
-<div class="menu-list">
+<br>
+
+<!-- Список блюд -->
+<div style="display: flex; flex-wrap: wrap;">
     {% for dish in dishes %}
-    <div class="dish-card">
-        <img src="{{ url_for('static', filename='uploads/' ~ (dish.image or 'default.jpg')) }}" alt="{{ dish.title }}">
-        <h3>{{ dish.title }}</h3>
-        <p>{{ dish.description }}</p>
-        <b>{{ dish.price }} ₽</b>
+    <div style="border:1px solid #ccc; margin:10px; padding:10px; width:250px;">
+        <a href="{{ url_for('dish_detail', dish_id=dish['id']) }}">
+            {% if dish['image'] %}
+                <img src="{{ url_for('static', filename='uploads/' ~ dish['image']) }}" alt="{{ dish['title'] }}" style="width:230px;">
+            {% else %}
+                <img src="{{ url_for('static', filename='no-image.png') }}" style="width:230px;">
+            {% endif %}
+            <h3>{{ dish['title'] }}</h3>
+        </a>
+        <div><b>Цена:</b> {{ dish['price'] }} руб.</div>
+        <div>{{ dish['description'] }}</div>
+        <!-- Добавить в корзину -->
+        <form method="post" action="{{ url_for('cart') }}">
+            <input type="hidden" name="dish_id" value="{{ dish['id'] }}">
+            <input type="number" name="qty" value="1" min="1" style="width: 50px;">
+            <button type="submit">В корзину</button>
+        </form>
     </div>
     {% endfor %}
 </div>

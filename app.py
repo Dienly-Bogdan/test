@@ -1,12 +1,11 @@
 import os
+import sqlite3
 from flask import (
     Flask, render_template, request, redirect, url_for, session, flash, send_from_directory
 )
 from werkzeug.utils import secure_filename
-import sqlite3
 
-# === CONFIGURATION ===
-app = Flask(__name__, static_folder="static", template_folder="templates")
+app = Flask(__name__)
 app.config["SECRET_KEY"] = "pizza17secret"
 app.config["UPLOAD_FOLDER"] = os.path.join("static", "uploads")
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
@@ -15,13 +14,16 @@ DB_PATH = "pasta_pizza.db"
 
 # === DATABASE HELPERS ===
 def connect():
-    return sqlite3.connect(DB_PATH)
+    # Возвращает соединение, где можно обращаться к полям как к словарю
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 def get_categories():
     conn = connect()
     c = conn.cursor()
     c.execute("SELECT id, name FROM categories ORDER BY name")
-    cats = [{"id": row[0], "name": row[1]} for row in c.fetchall()]
+    cats = [dict(row) for row in c.fetchall()]
     conn.close()
     return cats
 
@@ -32,7 +34,7 @@ def get_dishes(category_id=None):
         c.execute("SELECT * FROM dishes WHERE category_id=? ORDER BY id DESC", (category_id,))
     else:
         c.execute("SELECT * FROM dishes ORDER BY id DESC")
-    dishes = c.fetchall()
+    dishes = [dict(row) for row in c.fetchall()]
     conn.close()
     return dishes
 
@@ -42,7 +44,7 @@ def get_dish_by_id(dish_id):
     c.execute("SELECT * FROM dishes WHERE id=?", (dish_id,))
     row = c.fetchone()
     conn.close()
-    return row
+    return dict(row) if row else None
 
 def register_user(email, name, password):
     conn = connect()
@@ -63,7 +65,7 @@ def login_user(email, password):
     row = c.fetchone()
     conn.close()
     if row:
-        return {"id": row[0], "name": row[1], "is_admin": bool(row[2])}
+        return {"id": row["id"], "name": row["name"], "is_admin": bool(row["is_admin"])}
     return None
 
 def get_orders(user_id=None):
@@ -73,7 +75,7 @@ def get_orders(user_id=None):
         c.execute("SELECT * FROM orders WHERE user_id=? ORDER BY created_at DESC", (user_id,))
     else:
         c.execute("SELECT * FROM orders ORDER BY created_at DESC")
-    orders = c.fetchall()
+    orders = [dict(row) for row in c.fetchall()]
     conn.close()
     return orders
 
@@ -101,7 +103,7 @@ def get_reviews_for_dish(dish_id):
     conn = connect()
     c = conn.cursor()
     c.execute("SELECT r.rating, r.text, u.name, r.created_at FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.dish_id=? ORDER BY r.created_at DESC", (dish_id,))
-    reviews = c.fetchall()
+    reviews = [dict(row) for row in c.fetchall()]
     conn.close()
     return reviews
 
@@ -167,7 +169,9 @@ def index():
     dishes = get_dishes()
     return render_template("index.html", categories=categories, dishes=dishes)
 
-@app.route("/menu")
+
+
+@app.route("/menu", methods=["GET", "POST"])
 def menu():
     category_id = request.args.get("category_id")
     if category_id:
@@ -199,8 +203,8 @@ def cart():
     cart = get_cart()
     dish_ids = [int(did) for did in cart.keys()]
     dishes = [get_dish_by_id(did) for did in dish_ids]
-    cart_items = [(dish, cart[str(dish[0])]) for dish in dishes if dish]
-    total = sum(dish[3] * cart[str(dish[0])] for dish in dishes if dish)
+    cart_items = [(dish, cart[str(dish["id"])]) for dish in dishes if dish]
+    total = sum(dish["price"] * cart[str(dish["id"])] for dish in dishes if dish)
     return render_template("cart.html", cart_items=cart_items, total=total)
 
 @app.route("/cart/remove/<int:dish_id>", methods=["POST"])
@@ -239,15 +243,15 @@ def order_status(order_id):
     orders = get_orders(user_id=session["user_id"])
     status = None
     for o in orders:
-        if o[0] == order_id:
-            status = o[4]
+        if o["id"] == order_id:
+            status = o["status"]
             break
     return render_template("order_status.html", order_id=order_id, status=status)
 
 # === REVIEWS ===
 @app.route("/review/<int:dish_id>", methods=["POST"])
 @login_required
-def add_review(dish_id):
+def add_review_route(dish_id):
     rating = int(request.form.get("rating", 5))
     text = request.form.get("text", "")
     add_review(session["user_id"], dish_id, rating, text)
@@ -322,7 +326,7 @@ def admin_edit_dish(dish_id):
         is_veg = int(request.form.get('is_veg', 0))
         is_spicy = int(request.form.get('is_spicy', 0))
         image = request.files.get('image')
-        image_filename = dish[5]
+        image_filename = dish["image"]
         if image and image.filename:
             image_filename = secure_filename(image.filename)
             image.save(os.path.join(app.config["UPLOAD_FOLDER"], image_filename))

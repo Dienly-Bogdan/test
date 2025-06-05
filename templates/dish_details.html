@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{ dish["title"] }}</h2>
+{% if dish["image"] %}
+    <img src="{{ url_for('static', filename='uploads/' ~ dish["image"]) }}" style="width:300px;">
+{% endif %}
+<p><b>Цена:</b> {{ dish["price"] }} руб.</p>
+<p>{{ dish["description"] }}</p>
+
+<form method="post" action="{{ url_for('cart') }}">
+    <input type="hidden" name="dish_id" value="{{ dish["id"] }}">
+    <input type="number" name="qty" min="1" value="1" style="width:50px;">
+    <button type="submit">В корзину</button>
+</form>
+{% endblock %}
