@@ -1,6 +1,6 @@
 import sqlite3
 
-email = "admin@list.ru"  # <-- ВПИШИ свой email
+email = input("Введите ваш email, для получения Админ-прав: ")  # <-- ВПИШИ свой email
 
 conn = sqlite3.connect("pasta_pizza.db")
 c = conn.cursor()
