@@ -1,15 +1,71 @@
-{% extends "base.html" %}
-{% block title %}Вход | Паста и Пицца{% endblock %}
-{% block content %}
-<div class="auth-form">
-    <h2>Sign In</h2>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Вход и регистрация</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
+</head>
+<body>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="mb-4">
+      {% for message in messages %}
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-2">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+<div class="container" id="container">
+
+  <!-- Регистрация -->
+  <div class="form-container sign-up-container">
     <form method="post">
-        <label>E-mail address</label>
-        <input type="email" name="email" required>
-        <label>Пароль</label>
-        <input type="password" name="password" required>
-        <button type="submit">Войти</button>
+      <h1>Регистрация</h1>
+      <span>или войдите, если уже зарегистрированы</span>
+
+      <!-- Ключевые изменения -->
+      <input type="hidden" name="form_type" value="register">
+      <input type="text" name="name" placeholder="Имя" required />
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Пароль" required />
+
+      <button type="submit">Зарегистрироваться</button>
     </form>
-    <p>Нет аккаунта? <a href="{{ url_for('register') }}">Регистрация</a></p>
+  </div>
+
+  <!-- Вход -->
+  <div class="form-container sign-in-container">
+    <form method="post">
+      <h1>Войти</h1>
+
+      <!-- Ключевые изменения -->
+      <input type="hidden" name="form_type" value="login">
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Пароль" required />
+
+      <button type="submit">Войти</button>
+    </form>
+  </div>
+
+  <!-- Переключатель -->
+  <div class="overlay-container">
+    <div class="overlay">
+      <div class="overlay-panel overlay-left">
+        <h1>С возвращением!</h1>
+        <p>Чтобы оставаться с нами на связи, пожалуйста, авторизуйтесь!</p>
+        <button class="ghost" id="signIn">Вход</button>
+      </div>
+      <div class="overlay-panel overlay-right">
+        <h1>Привет!</h1>
+        <p>Впервые здесь? Зарегистрируйтесь и начните заказывать!</p>
+        <button class="ghost" id="signUp">Регистрация</button>
+      </div>
+    </div>
+  </div>
 </div>
-{% endblock %}
+
+<script src="{{ url_for('static', filename='js/register.js') }}"></script>
+</body>
+</html>

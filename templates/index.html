@@ -1,16 +1,90 @@
-{% extends "base.html" %}
-{% block title %}Паста и Пицца | Главная{% endblock %}
-{% block content %}
-<h2>Добро пожаловать в "Паста и Пицца"!</h2>
-<p>Онлайн сервис заказа итальянской кухни на дом или в офис. <a href="{{ url_for('menu') }}">Перейти к меню</a></p>
-<div class="menu-preview">
-    {% for dish in dishes[:4] %}
-    <div class="dish-card">
-        <img src="{{ url_for('static', filename='uploads/' ~ (dish.image or 'default.jpg')) }}" alt="{{ dish.title }}">
-        <h3>{{ dish.title }}</h3>
-        <p>{{ dish.description }}</p>
-        <b>{{ dish.price }} ₽</b>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Паста и Пицца</title>
+  <!-- Tailwind CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <!-- Google Fonts для истории -->
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+  <!-- Шапка -->
+  <header class="bg-white shadow p-4 flex justify-between items-center">
+    <a href="/" class="flex items-center space-x-2">
+      <img src="{{ url_for('static', filename='uploads/pasta_pizza.png') }}" alt="Логотип Паста и Пицца" class="h-10 w-10 rounded-full" loading="lazy">
+      <h1 class="text-xl font-bold">Паста и Пицца</h1>
+    </a>
+    <nav>
+  <a href="/menu" class="mx-2 text-blue-600 hover:underline">Меню</a>
+  
+  {% if session.user_id %}
+    <a href="/cart" class="mx-2 text-blue-600 hover:underline">Корзина</a>
+    <a href="/orders" class="mx-2 text-blue-600 hover:underline">Заказы</a>
+  {% endif %}
+
+  {% if session.user_id %}
+    <span id="userMenuButton" class="mx-2 text-gray-700 cursor-pointer relative select-none">
+      {{ session.user_name }}
+      <!-- Выпадающее меню -->
+      <div id="userDropdown" class="hidden absolute top-full right-0 bg-white border rounded shadow p-2 z-10">
+        <a href="/logout" class="block text-red-600 hover:underline">Выйти</a>
+      </div>
+    </span>
+  {% else %}
+    <a href="/login" class="mx-2 text-blue-600 hover:underline">Войти</a>
+  {% endif %}
+
+  {% if session.is_admin %}
+    <a href="/admin/dashboard" class="mx-2 text-purple-600 hover:underline">Админ-панель</a>
+  {% endif %}
+</nav>
+
+  </header>
+
+<script>
+  const btn = document.getElementById('userMenuButton');
+  const dropdown = document.getElementById('userDropdown');
+
+  if (btn && dropdown) {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdown.classList.toggle('hidden');
+    });
+
+    window.addEventListener('click', () => {
+      if (!dropdown.classList.contains('hidden')) {
+        dropdown.classList.add('hidden');
+      }
+    });
+  }
+</script>
+
+  <!-- Контент -->
+  <main class="p-6">
+    <!-- Категории -->
+    <div class="flex flex-wrap gap-4 mb-6">
+      <a href="/menu?category=Пицца" class="px-4 py-2 bg-red-100 rounded-full hover:bg-red-200">Пицца</a>
+      <a href="/menu?category=Паста" class="px-4 py-2 bg-yellow-100 rounded-full hover:bg-yellow-200">Паста</a>
+      <a href="/menu?category=Салаты" class="px-4 py-2 bg-green-100 rounded-full hover:bg-green-200">Салаты</a>
+      <a href="/menu?category=Напитки" class="px-4 py-2 bg-blue-100 rounded-full hover:bg-blue-200">Напитки</a>
+      <a href="/menu?category=Десерты" class="px-4 py-2 bg-pink-100 rounded-full hover:bg-pink-200">Десерты</a>
     </div>
-    {% endfor %}
-</div>
-{% endblock %}
+
+    <!-- История ресторана -->
+    <section class="my-12 p-6 bg-white rounded-xl shadow" style="font-family: 'Dancing Script', cursive;">
+      <h2 class="text-3xl font-bold mb-4">Наша история</h2>
+      <div class="md:flex md:items-center md:space-x-6">
+        <img src="{{ url_for('static', filename='uploads/history.png') }}" alt="История ресторана" class="w-full md:w-1/2 rounded-lg mb-4 md:mb-0" loading="lazy">
+        <p class="text-gray-700 leading-relaxed text-lg">
+          Ресторан «Паста и Пицца» родился из мечты двух друзей — шефа-повара Марко и пекаря Антона.
+          Вместе они отправились в гастрономическое путешествие по Италии, чтобы изучить лучшие рецепты традиционной пиццы и пасты.
+          Вернувшись домой, они открыли уютный ресторанчик, где каждый может попробовать настоящую Италию на вкус.
+          Сегодня «Паста и Пицца» — это не просто еда, а место встречи друзей и семьи за горячей, ароматной пиццей и свежей пастой, приготовленной с любовью.
+        </p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

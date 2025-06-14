@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Мои заказы — Паста и Пицца</title>
+  <!-- Tailwind CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+  <!-- Шапка (та же самая) -->
+  <header class="bg-white shadow p-4 flex justify-between items-center">
+    <a href="/" class="flex items-center gap-3">
+      <img src="{{ url_for('static', filename='uploads/pasta_pizza.png') }}" alt="Логотип" class="h-10 w-10 rounded-full" loading="lazy">
+      <h1 class="text-2xl font-bold">Паста и Пицца</h1>
+    </a>
+    <nav>
+  <a href="/menu" class="mx-2 text-blue-600 hover:underline">Меню</a>
+  
+  {% if session.user_id %}
+    <a href="/cart" class="mx-2 text-blue-600 hover:underline">Корзина</a>
+    <a href="/orders" class="mx-2 text-blue-600 hover:underline">Заказы</a>
+  {% endif %}
+
+  {% if session.user_id %}
+    <span id="userMenuButton" class="mx-2 text-gray-700 cursor-pointer relative select-none">
+      {{ session.user_name }}
+      <!-- Выпадающее меню -->
+      <div id="userDropdown" class="hidden absolute top-full right-0 bg-white border rounded shadow p-2 z-10">
+        <a href="/logout" class="block text-red-600 hover:underline">Выйти</a>
+      </div>
+    </span>
+  {% else %}
+    <a href="/login" class="mx-2 text-blue-600 hover:underline">Войти</a>
+  {% endif %}
+
+  {% if session.is_admin %}
+    <a href="/admin/dashboard" class="mx-2 text-purple-600 hover:underline">Админ-панель</a>
+  {% endif %}
+</nav>
+
+  </header>
+
+  <!-- Скрипт для выпадающего меню -->
+  <script>
+    const btn = document.getElementById('userMenuButton');
+    const dropdown = document.getElementById('userDropdown');
+
+    if (btn && dropdown) {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('hidden');
+      });
+
+      window.addEventListener('click', () => {
+        if (!dropdown.classList.contains('hidden')) {
+          dropdown.classList.add('hidden');
+        }
+      });
+    }
+  </script>
+
+  <!-- Контент -->
+  <main class="max-w-5xl mx-auto p-6">
+    <h2 class="text-3xl font-bold mb-6">Мои заказы</h2>
+
+    {% if orders %}
+      <div class="space-y-6">
+        {% for order in orders %}
+          <div class="bg-white rounded-xl shadow p-6 border border-gray-100">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-xl font-semibold">Заказ #{{ order.id }}</h3>
+              <span class="text-sm px-3 py-1 rounded-full
+                {% if order.status == 'В обработке' %}
+                  bg-yellow-100 text-yellow-800
+                {% elif order.status == 'Доставлен' %}
+                  bg-green-100 text-green-800
+                {% else %}
+                  bg-gray-100 text-gray-800
+                {% endif %}
+              ">
+                {{ order.status }}
+              </span>
+            </div>
+            <p class="text-gray-600 mb-2"><strong>Дата заказа:</strong> {{ order.date_created.strftime('%d.%m.%Y %H:%M') }}</p>
+            <p class="text-gray-600 mb-4"><strong>Сумма:</strong> {{ order.total_price }} ₽</p>
+
+            <h4 class="font-semibold mb-2">Состав заказа:</h4>
+            <ul class="list-disc list-inside text-gray-700">
+              {% for item in order.items %}
+                <li>{{ item.name }} × {{ item.quantity }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-gray-600">У вас пока нет заказов.</p>
+    {% endif %}
+  </main>
+
+</body>
+</html>

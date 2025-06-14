@@ -1,39 +1,185 @@
-{% extends "base.html" %}
-{% block title %}Корзина | Паста и Пицца{% endblock %}
-{% block content %}
-<h2>Корзина</h2>
-{% if not cart_items %}
-    <p>Ваша корзина пуста.</p>
-    <a href="{{ url_for('menu') }}">К меню</a>
-{% else %}
-    <table border="1" cellpadding="8" style="margin-bottom:20px;">
-        <tr>
-            <th>Блюдо</th>
-            <th>Количество</th>
-            <th>Цена</th>
-            <th>Сумма</th>
-            <th></th>
-        </tr>
-        {% for dish, qty in cart_items %}
-        <tr>
-            <td>
-                <img src="{{ url_for('static', filename='uploads/' ~ (dish.image or 'default.jpg')) }}" alt="" width="54" style="vertical-align:middle;">
-                {{ dish.title }}
-            </td>
-            <td>{{ qty }}</td>
-            <td>{{ dish.price }} ₽</td>
-            <td>{{ dish.price * qty }} ₽</td>
-            <td>
-                <form action="{{ url_for('cart_remove', dish_id=dish.id) }}" method="post">
-                    <button style="background:#c0392b;color:#fff;border:none;border-radius:3px;padding:2px 7px;">Удалить</button>
-                </form>
-            </td>
-        </tr>
+<!DOCTYPE html> 
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Корзина</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+<header class="bg-white shadow p-4 flex justify-between items-center">
+    <a href="/" class="flex items-center space-x-2">
+      <img src="{{ url_for('static', filename='uploads/pasta_pizza.png') }}" alt="Логотип Паста и Пицца" class="h-10 w-10 rounded-full" loading="lazy" />
+      <h1 class="text-xl font-bold">Паста и Пицца</h1>
+    </a>
+    <nav>
+      <a href="/menu" class="mx-2 text-blue-600 hover:underline">Меню</a>
+      
+      {% if session.user_id %}
+        <a href="/cart" id="cartLink" class="mx-2 text-blue-600 hover:underline">Корзина</a>
+        <a href="/orders" class="mx-2 text-blue-600 hover:underline">Заказы</a>
+      {% endif %}
+
+      {% if session.user_id %}
+        <span id="userMenuButton" class="mx-2 text-gray-700 cursor-pointer relative select-none">
+          {{ session.user_name }}
+          <!-- Выпадающее меню -->
+          <div id="userDropdown" class="hidden absolute top-full right-0 bg-white border rounded shadow p-2 z-10">
+            <a href="/logout" class="block text-red-600 hover:underline">Выйти</a>
+          </div>
+        </span>
+      {% else %}
+        <a href="/login" class="mx-2 text-blue-600 hover:underline">Войти</a>
+      {% endif %}
+
+      {% if session.is_admin %}
+        <a href="/admin/dashboard" class="mx-2 text-purple-600 hover:underline">Админ-панель</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <script>
+    const btn = document.getElementById('userMenuButton');
+    const dropdown = document.getElementById('userDropdown');
+
+    if (btn && dropdown) {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        dropdown.classList.toggle('hidden');
+      });
+
+      window.addEventListener('click', () => {
+        if (!dropdown.classList.contains('hidden')) {
+          dropdown.classList.add('hidden');
+        }
+      });
+    }
+  </script>
+
+  <!-- Основной контент -->
+  <main class="flex-grow container mx-auto px-4 py-6">
+    {% if cart_items %}
+      <div class="space-y-6">
+        {% for item in cart_items %}
+          <div class="flex items-center bg-white rounded shadow p-4">
+            {% if item.image %}
+              <img src="{{ url_for('uploads', filename=item.image) }}" alt="{{ item.title }}" class="w-24 h-24 object-cover rounded mr-6" />
+            {% else %}
+              <div class="w-24 h-24 bg-gray-300 rounded mr-6 flex items-center justify-center text-gray-500">
+                Нет фото
+              </div>
+            {% endif %}
+
+            <div class="flex-grow">
+              <h2 class="text-xl font-semibold">{{ item.title }}</h2>
+              <p class="text-gray-600">Цена: <span class="font-medium">{{ item.price }} ₽</span></p>
+
+              <div class="mt-2 flex items-center space-x-2 w-max">
+                <button data-action="decrease" data-id="{{ item.id }}" class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition select-none">−</button>
+                <input
+                  type="number"
+                  min="1"
+                  value="{{ item.quantity }}"
+                  data-id="{{ item.id }}"
+                  class="w-16 p-1 border rounded text-center quantity-input"
+                />
+                <button data-action="increase" data-id="{{ item.id }}" class="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition select-none">+</button>
+              </div>
+
+              <p class="text-gray-700 mt-2">Сумма: <span class="font-bold text-lg">{{ item.subtotal }} ₽</span></p>
+            </div>
+
+            <form action="{{ url_for('cart_remove', dish_id=item.id) }}" method="post" class="ml-6">
+              <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">
+                Удалить
+              </button>
+            </form>
+          </div>
         {% endfor %}
-    </table>
-    <div style="font-size:17px;font-weight:bold;margin-bottom:10px;">
-        Итого: {{ total }} ₽
-    </div>
-    <a href="{{ url_for('order') }}" class="auth-form button" style="background:#c0392b;color:#fff;padding:8px 16px;border-radius:6px;">Оформить заказ</a>
-{% endif %}
-{% endblock %}
+      </div>
+
+      <div class="mt-8 text-right space-y-4">
+        <div class="text-2xl font-bold" id="total-price">
+          Итого: {{ total }} ₽
+        </div>
+        <div>
+          <a href="{{ url_for('checkout') }}" 
+           class="inline-block px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700 transition font-semibold">
+          Оформить заказ
+          </a>
+        </div>
+      </div>
+
+    {% else %}
+      <p class="text-center text-gray-600 text-lg">Ваша корзина пуста.</p>
+    {% endif %}
+  </main>
+
+  <footer class="bg-white shadow p-4 text-center text-gray-500">
+    © 2025 Твой FoodShop
+  </footer>
+
+  <script>
+    // Отправляем обновление количества на сервер и обновляем UI без перезагрузки
+    async function updateQuantity(dishId, quantity) {
+      if (quantity < 1) quantity = 1; // минимальное количество 1
+
+      try {
+        const response = await fetch(`/cart/update/${dishId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `quantity=${quantity}`
+        });
+        if (!response.ok) throw new Error('Ошибка сервера');
+
+        // Обновим страницу (можно доработать, чтобы обновлять сумму и итого без полной перезагрузки)
+        location.reload();
+      } catch (e) {
+        alert('Не удалось обновить количество товара.');
+        console.error(e);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Кнопки + и -
+      document.querySelectorAll('button[data-action]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const dishId = btn.dataset.id;
+          const input = document.querySelector(`input.quantity-input[data-id="${dishId}"]`);
+          let qty = parseInt(input.value);
+
+          if (btn.dataset.action === 'increase') {
+            qty++;
+          } else if (btn.dataset.action === 'decrease') {
+            qty = qty > 1 ? qty - 1 : 1;
+          }
+          input.value = qty;
+          updateQuantity(dishId, qty);
+        });
+      });
+
+      // Ввод вручную с задержкой, чтобы не спамить сервер на каждую букву
+      let typingTimer;
+      const typingDelay = 700;
+      document.querySelectorAll('input.quantity-input').forEach(input => {
+        input.addEventListener('input', () => {
+          clearTimeout(typingTimer);
+          const dishId = input.dataset.id;
+          let qty = parseInt(input.value);
+
+          typingTimer = setTimeout(() => {
+            if (isNaN(qty) || qty < 1) {
+              qty = 1;
+              input.value = qty;
+            }
+            updateQuantity(dishId, qty);
+          }, typingDelay);
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>

@@ -1,9 +1,73 @@
-{% extends "base.html" %}
-{% block content %}
-<h2>Админ-панель</h2>
-<ul>
-  <li><a href="{{ url_for('admin_manage_menu') }}">Меню</a></li>
-  <li><a href="{{ url_for('admin_manage_categories') }}">Категории</a></li>
-  <li><a href="{{ url_for('admin_manage_orders') }}">Заказы</a></li>
-</ul>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Админ-панель - Паста и Пицца</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <header class="bg-white shadow p-6 mb-8">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <h1 class="text-3xl font-bold">Админ-панель</h1>
+      <nav class="space-x-4">
+        <a href="{{ url_for('admin_manage_menu') }}" class="text-blue-600 hover:underline">Управление Меню</a>
+        <a href="{{ url_for('admin_manage_categories') }}" class="text-blue-600 hover:underline">Управление Категориями</a>
+        <a href="{{ url_for('admin_manage_orders') }}" class="text-blue-600 hover:underline">Управление Заказами</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="mb-6">
+          {% for category, message in messages %}
+            <div class="mb-4 px-4 py-3 rounded {{ 'bg-green-200 text-green-800' if category == 'success' else 'bg-red-200 text-red-800' }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Форма добавления блюда -->
+      <section class="bg-white p-6 rounded-xl shadow-md">
+        <h2 class="text-2xl font-semibold mb-4">Добавить новое блюдо</h2>
+        <form method="POST" enctype="multipart/form-data" class="space-y-4">
+          <input name="title" type="text" placeholder="Название" class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400" required />
+          <textarea name="description" placeholder="Описание" class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400" rows="3" required></textarea>
+          <input name="price" type="number" step="0.01" placeholder="Цена" class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400" required />
+          <select name="category" class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400" required>
+            <option value="">Выберите категорию</option>
+            {% for cat in categories %}
+              <option value="{{ cat.id }}">{{ cat.name }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition">Добавить блюдо</button>
+        </form>
+      </section>
+
+      <!-- Список активных заказов -->
+      <section class="bg-white p-6 rounded-xl shadow-md">
+        <h2 class="text-2xl font-semibold mb-4">Активные заказы</h2>
+        {% if orders %}
+          <ul class="space-y-4 max-h-[500px] overflow-y-auto">
+            {% for order in orders %}
+              <li class="border p-4 rounded-lg shadow-sm bg-gray-50">
+                <p class="font-semibold">{{ order.name }} — {{ order.address }}</p>
+                <p class="text-sm text-gray-700">Телефон: {{ order.phone }}</p>
+                <p class="text-sm text-gray-700">Товары: {{ order.items }}</p>
+                <p class="text-sm text-gray-700">Статус: <span class="font-medium">{{ order.status }}</span></p>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-gray-600">Активных заказов нет.</p>
+        {% endif %}
+      </section>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,30 +1,40 @@
 {% extends "base.html" %}
+
+{% block title %}Управление меню - Паста и Пицца{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
 {% block content %}
-<h2>Блюда</h2>
-<a class="btn btn-success mb-3" href="{{ url_for('admin_add_dish') }}">Добавить блюдо</a>
-<table class="table">
-    <tr>
-        <th>ID</th><th>Название</th><th>Цена</th><th>Категория</th><th></th>
-    </tr>
-    {% for dish in dishes %}
-    <tr>
-        <td>{{ dish["id"] }}</td>
-        <td>{{ dish["title"] }}</td>
-        <td>{{ dish["price"] }}</td>
-        <td>
-          {% for cat in categories %}
-            {% if cat["id"] == dish["category_id"] %}
-              {{ cat["name"] }}
-            {% endif %}
-          {% endfor %}
-        </td>
-        <td>
-          <a href="{{ url_for('admin_edit_dish', dish_id=dish["id"]) }}">✏️</a>
-          <form action="{{ url_for('admin_delete_dish', dish_id=dish["id"]) }}" method="post" style="display:inline;">
-              <button class="btn btn-danger btn-sm" onclick="return confirm('Удалить блюдо?')">🗑️</button>
-          </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+<section class="admin-panel">
+    <h2 class="admin-title">Управление меню</h2>
+
+    <div class="admin-menu-list">
+        {% for dish in dishes %}
+        <div class="menu-item">
+            <div class="menu-item-image">
+                <img src="{{ url_for('uploads', filename=dish.image) }}" alt="{{ dish.title }}">
+            </div>
+            <div class="menu-item-info">
+                <h3>{{ dish.title }}</h3>
+                <p class="category">{{ dish.category_name }}</p>
+                <span class="price">{{ dish.price }} ₽</span>
+            </div>
+            <div class="menu-item-actions">
+                <a href="{{ url_for('admin_edit_dish', dish_id=dish.id) }}" class="btn btn-edit">Редактировать</a>
+                <form method="POST" action="{{ url_for('admin_delete_dish', dish_id=dish.id) }}" class="inline-form">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Удалить это блюдо?')">Удалить</button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <p class="no-items">Нет добавленных блюд.</p>
+        {% endfor %}
+    </div>
+
+    <div class="add-dish-container">
+        <a href="{{ url_for('admin_add_dish') }}" class="btn btn-add">➕ Добавить блюдо</a>
+    </div>
+</section>
 {% endblock %}

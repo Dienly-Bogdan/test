@@ -1,37 +1,188 @@
-{% extends "base.html" %}
-{% block content %}
-<h2>Меню</h2>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Меню — Паста и Пицца</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-800">
 
-<!-- Категории -->
-<div>
-    <b>Категории:</b>
-    {% for cat in categories %}
-        <a href="{{ url_for('menu') }}?category_id={{ cat['id'] }}">{{ cat['name'] }}</a>{% if not loop.last %} | {% endif %}
-    {% endfor %}
-</div>
-<br>
+  <!-- Шапка -->
+  <header class="bg-white shadow p-4 flex justify-between items-center">
+    <a href="/" class="flex items-center space-x-2">
+      <img src="{{ url_for('static', filename='uploads/pasta_pizza.png') }}" alt="Логотип Паста и Пицца" class="h-10 w-10 rounded-full" loading="lazy" />
+      <h1 class="text-xl font-bold">Паста и Пицца</h1>
+    </a>
+    <nav>
+      <a href="/menu" class="mx-2 text-blue-600 hover:underline">Меню</a>
+      
+      {% if session.user_id %}
+        <a href="/cart" id="cartLink" class="mx-2 text-blue-600 hover:underline">Корзина</a>
+        <a href="/orders" class="mx-2 text-blue-600 hover:underline">Заказы</a>
+      {% endif %}
 
-<!-- Список блюд -->
-<div style="display: flex; flex-wrap: wrap;">
-    {% for dish in dishes %}
-    <div style="border:1px solid #ccc; margin:10px; padding:10px; width:250px;">
-        <a href="{{ url_for('dish_detail', dish_id=dish['id']) }}">
-            {% if dish['image'] %}
-                <img src="{{ url_for('static', filename='uploads/' ~ dish['image']) }}" alt="{{ dish['title'] }}" style="width:230px;">
-            {% else %}
-                <img src="{{ url_for('static', filename='no-image.png') }}" style="width:230px;">
-            {% endif %}
-            <h3>{{ dish['title'] }}</h3>
-        </a>
-        <div><b>Цена:</b> {{ dish['price'] }} руб.</div>
-        <div>{{ dish['description'] }}</div>
-        <!-- Добавить в корзину -->
-        <form method="post" action="{{ url_for('cart') }}">
-            <input type="hidden" name="dish_id" value="{{ dish['id'] }}">
-            <input type="number" name="qty" value="1" min="1" style="width: 50px;">
-            <button type="submit">В корзину</button>
-        </form>
+      {% if session.user_id %}
+        <span id="userMenuButton" class="mx-2 text-gray-700 cursor-pointer relative select-none">
+          {{ session.user_name }}
+          <div id="userDropdown" class="hidden absolute top-full right-0 bg-white border rounded shadow p-2 z-10">
+            <a href="/logout" class="block text-red-600 hover:underline">Выйти</a>
+          </div>
+        </span>
+      {% else %}
+        <a href="/login" class="mx-2 text-blue-600 hover:underline">Войти</a>
+      {% endif %}
+
+      {% if session.is_admin %}
+        <a href="/admin/dashboard" class="mx-2 text-purple-600 hover:underline">Админ-панель</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <script>
+    const btn = document.getElementById('userMenuButton');
+    const dropdown = document.getElementById('userDropdown');
+
+    if (btn && dropdown) {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        dropdown.classList.toggle('hidden');
+      });
+
+      window.addEventListener('click', () => {
+        if (!dropdown.classList.contains('hidden')) {
+          dropdown.classList.add('hidden');
+        }
+      });
+    }
+  </script>
+
+  <main class="p-4 max-w-5xl mx-auto">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="mb-4">
+          {% for message in messages %}
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-2">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="mb-6">
+      <h2 class="text-2xl font-bold mb-2">Категории</h2>
+      <div class="flex flex-wrap gap-4">
+        <a href="/menu" class="px-4 py-2 bg-blue-100 rounded hover:bg-blue-200">Все</a>
+        {% for cat in categories %}
+          <a href="/menu?category_id={{ cat.id }}" class="px-4 py-2 bg-blue-100 rounded hover:bg-blue-200">
+            {{ cat.name }}
+          </a>
+        {% endfor %}
+      </div>
     </div>
-    {% endfor %}
-</div>
-{% endblock %}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for dish in dishes %}
+        <div class="bg-white shadow rounded p-4">
+          {% if dish.image %}
+            <a href="{{ url_for('dish_detail', dish_id=dish.id) }}">
+              <img src="{{ url_for('uploads', filename=dish.image) }}" alt="{{ dish.title }}" class="w-full h-48 object-cover mb-4 rounded cursor-pointer" loading="lazy">
+            </a>
+          {% endif %}
+          <h3 class="text-lg font-bold mb-2">{{ dish.title }}</h3>
+          <p class="text-gray-600 mb-2">{{ dish.description }}</p>
+          <p class="font-semibold mb-2">{{ dish.price }} ₽</p>
+          <div class="flex justify-between items-center">
+            <!-- Удалил ссылку "Подробнее" -->
+            <form action="/cart" method="post" class="inline flex items-center space-x-2">
+              <input type="hidden" name="dish_id" value="{{ dish.id }}">
+              <button type="submit" class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600">В корзину</button>
+              <!-- JS добавит счётчик -->
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </main>
+
+  <script>
+    const CART_KEY = 'pastaPizzaCart';
+
+    function getCart() {
+      const cart = localStorage.getItem(CART_KEY);
+      return cart ? JSON.parse(cart) : {};
+    }
+
+    function saveCart(cart) {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    }
+
+    function updateCartCount() {
+      const cart = getCart();
+      const totalCount = Object.values(cart).reduce((a, b) => a + b, 0);
+      const cartLink = document.getElementById('cartLink');
+      if (cartLink) {
+        cartLink.textContent = `Корзина (${totalCount})`;
+      }
+    }
+
+    function createCounter(dishId, container) {
+      const cart = getCart();
+      const count = cart[dishId] || 0;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'flex items-center space-x-2 ml-2';
+
+      const minusBtn = document.createElement('button');
+      minusBtn.textContent = '-';
+      minusBtn.className = 'px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600';
+      minusBtn.type = 'button';
+
+      const countSpan = document.createElement('span');
+      countSpan.textContent = count;
+      countSpan.className = 'w-6 text-center';
+
+      const plusBtn = document.createElement('button');
+      plusBtn.textContent = '+';
+      plusBtn.className = 'px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600';
+      plusBtn.type = 'button';
+
+      wrapper.appendChild(minusBtn);
+      wrapper.appendChild(countSpan);
+      wrapper.appendChild(plusBtn);
+
+      plusBtn.addEventListener('click', () => {
+        cart[dishId] = (cart[dishId] || 0) + 1;
+        countSpan.textContent = cart[dishId];
+        saveCart(cart);
+        updateCartCount();
+      });
+
+      minusBtn.addEventListener('click', () => {
+        if (cart[dishId] > 0) {
+          cart[dishId]--;
+          if (cart[dishId] === 0) {
+            delete cart[dishId];
+          }
+          countSpan.textContent = cart[dishId] || 0;
+          saveCart(cart);
+          updateCartCount();
+        }
+      });
+
+      container.appendChild(wrapper);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateCartCount();
+
+      document.querySelectorAll('form[action="/cart"]').forEach(form => {
+        const dishId = form.querySelector('input[name="dish_id"]').value;
+        createCounter(dishId, form);
+      });
+    });
+  </script>
+
+</body>
+</html>

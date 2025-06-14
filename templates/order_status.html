@@ -1,14 +1,17 @@
 {% extends "base.html" %}
-{% block title %}Статус заказа | Паста и Пицца{% endblock %}
+
+{% block title %}Статус заказа - Паста и Пицца{% endblock %}
+
 {% block content %}
-<div style="max-width:420px;margin:40px auto;background:#fff;padding:28px 20px;border-radius:14px;box-shadow:0 2px 14px #0001;text-align:center;">
-    <h2>Статус заказа</h2>
-    <div style="font-size:23px;color:#c0392b;margin:18px 0;">
-        №{{ order_id }}
+<section class="order-status">
+    <h2>Ваш заказ №12345</h2>
+    <div class="status-card">
+        <div class="status-step active">Принят</div>
+        <div class="status-step">Готовится</div>
+        <div class="status-step">Доставляется</div>
+        <div class="status-step">Выполнен</div>
     </div>
-    <div style="font-size:19px;margin-bottom:17px;">
-        <b>{{ status }}</b>
-    </div>
-    <a href="{{ url_for('index') }}" style="color:#c0392b;">На главную</a>
-</div>
+    <p>Спасибо за заказ! Мы свяжемся с вами для подтверждения.</p>
+    <a href="/" class="btn">Вернуться на главную</a>
+</section>
 {% endblock %}

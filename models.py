@@ -1,5 +1,3 @@
-# models.py
-
 class User:
     def __init__(self, id, email, name, is_admin=False, blocked=False):
         self.id = id

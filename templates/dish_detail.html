@@ -1,37 +1,100 @@
-{% extends "base.html" %}
-{% block content %}
-<h2>{{ dish["title"] }}</h2>
-{% if dish["image"] %}
-    <img src="{{ url_for('static', filename='uploads/' ~ dish["image"]) }}" class="img-fluid" style="max-width:350px;">
-{% endif %}
-<p><b>Цена:</b> {{ dish["price"] }} руб.</p>
-<p>{{ dish["description"] }}</p>
-<form method="post" action="{{ url_for('cart') }}">
-    <input type="hidden" name="dish_id" value="{{ dish["id"] }}">
-    <input type="number" name="qty" min="1" value="1" style="width:60px;">
-    <button class="btn btn-success">В корзину</button>
-</form>
-<h4>Отзывы</h4>
-{% for review in reviews %}
-<div class="card mb-2">
-    <div class="card-body">
-        <div>Оценка: {{ review["rating"] }} ★</div>
-        <div>{{ review["text"] }}</div>
-        <div class="text-muted" style="font-size: 0.9em;">{{ review["name"] }}, {{ review["created_at"] }}</div>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ dish.title }} — Паста и Пицца</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+  <!-- Шапка -->
+  <header class="bg-white shadow p-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold">Паста и Пицца</h1>
+    <nav>
+      <a href="/" class="mx-2 text-blue-600 hover:underline">Главная</a>
+      <a href="/menu" class="mx-2 text-blue-600 hover:underline">Меню</a>
+      <a href="/cart" class="mx-2 text-blue-600 hover:underline">Корзина</a>
+      {% if session.user_id %}
+        <span class="mx-2 text-gray-700">Привет, {{ session.user_name }}!</span>
+        <a href="/logout" class="mx-2 text-red-600 hover:underline">Выйти</a>
+      {% else %}
+        <a href="/login" class="mx-2 text-blue-600 hover:underline">Войти</a>
+      {% endif %}
+      {% if session.is_admin %}
+        <a href="/admin/dashboard" class="mx-2 text-purple-600 hover:underline">Админка</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <!-- Основной контент -->
+  <main class="p-4 max-w-3xl mx-auto">
+    <!-- Flash -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="mb-4">
+          {% for message in messages %}
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-2">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Карточка блюда -->
+    <div class="bg-white shadow rounded p-6 mb-8">
+      {% if dish.image %}
+        <img src="{{ url_for('uploads', filename=dish.image) }}" alt="{{ dish.title }}" class="w-full h-64 object-cover rounded mb-4">
+      {% endif %}
+      <h2 class="text-3xl font-bold mb-2">{{ dish.title }}</h2>
+      <p class="text-gray-700 mb-4">{{ dish.description }}</p>
+      <p class="text-xl font-semibold mb-4">{{ dish.price }} ₽</p>
+      <form action="/cart" method="post" class="inline">
+        <input type="hidden" name="dish_id" value="{{ dish.id }}">
+        <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Добавить в корзину</button>
+      </form>
     </div>
-</div>
-{% endfor %}
-{% if session.get("user_id") %}
-<form method="post" action="{{ url_for('add_review_route', dish_id=dish["id"]) }}">
-    <label>Оценка:</label>
-    <select name="rating" class="form-select" style="width:120px;display:inline-block;">
-        {% for i in range(1,6) %}
-        <option value="{{ i }}">{{ i }}</option>
-        {% endfor %}
-    </select>
-    <label>Отзыв:</label>
-    <input type="text" name="text" class="form-control" required>
-    <button class="btn btn-primary mt-2">Добавить отзыв</button>
-</form>
-{% endif %}
-{% endblock %}
+
+    <!-- Отзывы -->
+    <div class="bg-white shadow rounded p-6 mb-8">
+      <h3 class="text-2xl font-bold mb-4">Отзывы</h3>
+      {% if reviews %}
+        <div class="space-y-4">
+          {% for review in reviews %}
+            <div class="border-b pb-2">
+              <p class="text-yellow-500 mb-1">Оценка: {{ review.rating }} ⭐️</p>
+              <p class="text-gray-800 mb-1">{{ review.text }}</p>
+              <p class="text-sm text-gray-500">— {{ review.name }}, {{ review.created_at }}</p>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-gray-600">Отзывов пока нет. Будьте первым!</p>
+      {% endif %}
+    </div>
+
+    <!-- Форма оставить отзыв -->
+    {% if session.user_id %}
+      <div class="bg-white shadow rounded p-6">
+        <h3 class="text-2xl font-bold mb-4">Оставить отзыв</h3>
+        <form action="/review/{{ dish.id }}" method="post">
+          <label for="rating" class="block mb-2">Оценка (1–5):</label>
+          <select name="rating" id="rating" class="mb-4 w-full border rounded px-3 py-2">
+            {% for i in range(1,6) %}
+              <option value="{{ i }}">{{ i }}</option>
+            {% endfor %}
+          </select>
+          <label for="text" class="block mb-2">Ваш отзыв:</label>
+          <textarea name="text" id="text" rows="4" class="w-full border rounded px-3 py-2 mb-4"></textarea>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Отправить</button>
+        </form>
+      </div>
+    {% else %}
+      <div class="bg-yellow-100 border-l-4 border-yellow-500 p-4">
+        <p class="text-yellow-800">Чтобы оставить отзыв, <a href="/login" class="underline">войдите в аккаунт</a>.</p>
+      </div>
+    {% endif %}
+  </main>
+
+</body>
+</html>
